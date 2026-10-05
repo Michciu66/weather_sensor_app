@@ -1,10 +1,8 @@
 package com.chudzik.weather_sensors.advice;
 
-import com.chudzik.weather_sensors.exception.ConflictException;
-import com.chudzik.weather_sensors.exception.InvalidSensorApiKeyException;
-import com.chudzik.weather_sensors.exception.ResourceNotFoundException;
-import com.chudzik.weather_sensors.exception.UnprocessableException;
+import com.chudzik.weather_sensors.exception.*;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 
@@ -16,11 +14,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import org.springframework.web.bind.MissingRequestHeaderException;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -69,6 +67,46 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 "Conflict",
                 exception.getMessage()
         );
+    }
+
+    @ExceptionHandler(IncorrectLoginException.class)
+    public ProblemDetail handleIncorrectUsernameException(
+            IncorrectLoginException exception
+    ) {
+        return createProblem(
+                HttpStatus.BAD_REQUEST,
+                "Incorrect Login or Password",
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(MalformedQueryException.class)
+    public ProblemDetail handleMalformedQueryException(
+            MalformedQueryException exception
+    ) {
+        return createProblem(
+                HttpStatus.BAD_REQUEST,
+                "Malformed Query",
+                exception.getMessage()
+        );
+    }
+    @ExceptionHandler(InvalidTokenException.class)
+    public ProblemDetail handleInvalidTokenException(
+            InvalidTokenException exception
+    ) {
+        return createProblem(
+                HttpStatus.UNAUTHORIZED,
+                "Invalid Token",
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(IncorrectPasswordException.class)
+    public ProblemDetail handleIncorrectPassword(IncorrectPasswordException exception, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, exception.getMessage());
+        problem.setTitle("Forbidden");
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
     }
 
     @Override

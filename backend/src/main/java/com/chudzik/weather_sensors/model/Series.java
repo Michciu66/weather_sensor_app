@@ -28,13 +28,14 @@ public class Series {
     @Column(name = "series_color", nullable = false, length = 7)
     private String color;
 
+    @Column( name = "series_icon")
     private String icon;
 
-    @Column(length = 20)
+    @Column( name = "series_unit", length = 20)
     private String unit;
 
     @OneToMany(mappedBy = "series", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<Measurement> measurementList;
+    private List<Measurement> measurementList = new ArrayList<>();
 
     @OneToMany(mappedBy = "series", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Sensor> sensors = new ArrayList<>();
@@ -53,6 +54,14 @@ public class Series {
 
     public void setMinValue(BigDecimal minValue) {
         this.minValue = minValue;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public BigDecimal getMaxValue() {

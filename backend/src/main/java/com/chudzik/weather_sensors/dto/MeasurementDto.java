@@ -1,5 +1,6 @@
 package com.chudzik.weather_sensors.dto;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
@@ -8,7 +9,7 @@ public class MeasurementDto {
     private Long id;
     private Long seriesId;
     private Long sensorId;
-    private double value;
+    private BigDecimal value;
     private OffsetDateTime timestamp;
 
     public MeasurementDto() {
@@ -18,7 +19,7 @@ public class MeasurementDto {
             Long id,
             Long seriesId,
             Long sensorId,
-            double value,
+            BigDecimal value,
             OffsetDateTime timestamp
     ) {
         this.id = id;
@@ -52,11 +53,11 @@ public class MeasurementDto {
         this.sensorId = sensorId;
     }
 
-    public double getValue() {
+    public BigDecimal getValue() {
         return value;
     }
 
-    public void setValue(double value) {
+    public void setValue(BigDecimal value) {
         this.value = value;
     }
 
@@ -73,7 +74,7 @@ public class MeasurementDto {
         if (this == o) return true;
         if (!(o instanceof MeasurementDto that)) return false;
 
-        return Double.compare(value, that.value) == 0
+        return Objects.equals(value, that.value)
                 && Objects.equals(id, that.id)
                 && Objects.equals(seriesId, that.seriesId)
                 && Objects.equals(sensorId, that.sensorId)

@@ -1,7 +1,9 @@
 package com.chudzik.weather_sensors.service;
 
-import com.chudzik.weather_sensors.dto.MeasurementInputDto;
+import com.chudzik.weather_sensors.assembler.MeasurementOutputDtoAssembler;
+import com.chudzik.weather_sensors.dto.MeasurementAddDto;
 import com.chudzik.weather_sensors.dto.MeasurementOutputDto;
+import com.chudzik.weather_sensors.dto.MeasurementQueryDto;
 import com.chudzik.weather_sensors.exception.InvalidSensorApiKeyException;
 import com.chudzik.weather_sensors.exception.UnprocessableException;
 import com.chudzik.weather_sensors.model.Measurement;
@@ -9,12 +11,18 @@ import com.chudzik.weather_sensors.model.Sensor;
 import com.chudzik.weather_sensors.model.Series;
 import com.chudzik.weather_sensors.repository.MeasurementRepository;
 import com.chudzik.weather_sensors.repository.SensorRepository;
-import com.chudzik.weather_sensors.repository.SeriesRepository;
+import com.chudzik.weather_sensors.specification.MeasurementQuerySpecification;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Service
 public class MeasurementService {
@@ -29,8 +37,7 @@ public class MeasurementService {
     }
 
     @Transactional
-    public MeasurementOutputDto createMeasurement(String hashedSensorApiKey, MeasurementInputDto inputDto )
-    {
+    public MeasurementOutputDto createMeasurement(String hashedSensorApiKey, MeasurementAddDto inputDto) {
 
         Sensor sensor = sensorRepo.findByApiKeyHash(hashedSensorApiKey)
                 .orElseThrow(InvalidSensorApiKeyException::new);
@@ -71,13 +78,35 @@ public class MeasurementService {
 
         sensor.setLastMeasurementAt(timestamp);
 
-        return new MeasurementOutputDto(
-                savedMeasurement.getId(),
-                series.getId(),
-                sensor.getId(),
-                savedMeasurement.getValue(),
-                savedMeasurement.getTimestamp()
-        );
+        return MeasurementOutputDtoAssembler.assemble( savedMeasurement );
+    }
 
+    private Pageable createPageable(MeasurementQueryDto query) {
+        int limit = query.limit() != null
+                ? query.limit()
+                : 1000;
+
+        Sort.Direction direction =
+                "-timestamp".equals(query.sort())
+                        ? Sort.Direction.DESC
+                        : Sort.Direction.ASC;
+
+        Sort sort = Sort.by(direction, "timestamp");
+
+        return PageRequest.of( 0, limit, sort);
+    }
+
+    public List<MeasurementOutputDto> getMeasurements(MeasurementQueryDto query) {
+        Specification<Measurement> specification =
+                MeasurementQuerySpecification.buildSpecification(query);
+
+        Pageable pageable = createPageable(query);
+
+        Page<Measurement> page = measurementRepo.findAll(specification, pageable);
+
+        return page.getContent()
+                .stream()
+                .map(MeasurementOutputDtoAssembler::assemble)
+                .toList();
     }
 }

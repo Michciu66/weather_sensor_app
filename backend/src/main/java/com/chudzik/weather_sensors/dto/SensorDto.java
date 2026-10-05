@@ -13,10 +13,7 @@ public class SensorDto {
     private OffsetDateTime createdAt;
     private OffsetDateTime lastMeasurementAt;
 
-    private List<MeasurementDto> measurementList;
-
     public SensorDto() {
-        measurementList = new ArrayList<>();
     }
 
     public SensorDto(
@@ -24,15 +21,13 @@ public class SensorDto {
             String name,
             Long seriesId,
             OffsetDateTime createdAt,
-            OffsetDateTime lastMeasurementAt,
-            List<MeasurementDto> measurementList
+            OffsetDateTime lastMeasurementAt
     ) {
         this.id = id;
         this.name = name;
         this.seriesId = seriesId;
         this.createdAt = createdAt;
         this.lastMeasurementAt = lastMeasurementAt;
-        this.measurementList = measurementList;
     }
 
     public Long getId() {
@@ -75,14 +70,6 @@ public class SensorDto {
         this.lastMeasurementAt = lastMeasurementAt;
     }
 
-    public List<MeasurementDto> getMeasurementList() {
-        return measurementList;
-    }
-
-    public void setMeasurementList(List<MeasurementDto> measurementList) {
-        this.measurementList = measurementList;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -92,8 +79,7 @@ public class SensorDto {
                 && Objects.equals(name, that.name)
                 && Objects.equals(seriesId, that.seriesId)
                 && Objects.equals(createdAt, that.createdAt)
-                && Objects.equals(lastMeasurementAt, that.lastMeasurementAt)
-                && Objects.equals(measurementList, that.measurementList);
+                && Objects.equals(lastMeasurementAt, that.lastMeasurementAt);
     }
 
     @Override
@@ -103,8 +89,7 @@ public class SensorDto {
                 name,
                 seriesId,
                 createdAt,
-                lastMeasurementAt,
-                measurementList
+                lastMeasurementAt
         );
     }
 
@@ -116,7 +101,6 @@ public class SensorDto {
                 ", seriesId=" + seriesId +
                 ", createdAt=" + createdAt +
                 ", lastMeasurementAt=" + lastMeasurementAt +
-                ", measurementList=" + measurementList +
                 '}';
     }
 }

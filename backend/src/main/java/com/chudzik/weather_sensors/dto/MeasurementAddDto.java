@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
-public record MeasurementInputDto(@NotNull BigDecimal value, OffsetDateTime timestamp) {
+public record MeasurementAddDto(@NotNull BigDecimal value, OffsetDateTime timestamp) {
 
     @Override
     public String toString() {
