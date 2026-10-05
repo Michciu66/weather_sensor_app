@@ -5,6 +5,8 @@ import com.chudzik.weather_sensors.dto.MeasurementAddDto;
 import com.chudzik.weather_sensors.dto.MeasurementOutputDto;
 import com.chudzik.weather_sensors.dto.MeasurementQueryDto;
 import com.chudzik.weather_sensors.exception.InvalidSensorApiKeyException;
+import com.chudzik.weather_sensors.exception.MalformedQueryException;
+import com.chudzik.weather_sensors.exception.ResourceNotFoundException;
 import com.chudzik.weather_sensors.exception.UnprocessableException;
 import com.chudzik.weather_sensors.model.Measurement;
 import com.chudzik.weather_sensors.model.Sensor;
@@ -21,8 +23,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.List;
+
+import static java.lang.Math.min;
 
 @Service
 public class MeasurementService {
@@ -44,15 +49,14 @@ public class MeasurementService {
 
         Series series = sensor.getSeries();
 
-        OffsetDateTime now = OffsetDateTime.now();
-
-        OffsetDateTime timestamp = inputDto.timestamp();
+        Instant now = Instant.now();
+        Instant timestamp = inputDto.timestamp();
 
         if (timestamp == null) {
             timestamp = now;
         }
 
-        if (timestamp.isAfter(now.plusMinutes(5))) {
+        if (timestamp.isAfter(now.plusSeconds(300))) {
             throw new UnprocessableException(
                     "Measurement timestamp cannot be more than 5 minutes in the future"
             );
@@ -82,9 +86,7 @@ public class MeasurementService {
     }
 
     private Pageable createPageable(MeasurementQueryDto query) {
-        int limit = query.limit() != null
-                ? query.limit()
-                : 1000;
+        int limit = query.limit();
 
         Sort.Direction direction =
                 "-timestamp".equals(query.sort())
@@ -97,6 +99,15 @@ public class MeasurementService {
     }
 
     public List<MeasurementOutputDto> getMeasurements(MeasurementQueryDto query) {
+        if( query.limit() <= 0 || query.limit() > 10000 )
+        {
+            throw new MalformedQueryException("Limit must be between 1 and 10000");
+        }
+        if (query.sort() != null
+                && !query.sort().equals("timestamp")
+                && !query.sort().equals("-timestamp")) {
+            throw new MalformedQueryException("Invalid sort parameter");
+        }
         Specification<Measurement> specification =
                 MeasurementQuerySpecification.buildSpecification(query);
 
@@ -108,5 +119,11 @@ public class MeasurementService {
                 .stream()
                 .map(MeasurementOutputDtoAssembler::assemble)
                 .toList();
+    }
+
+    public MeasurementOutputDto getMeasurement(Long id) {
+        Measurement measurement = measurementRepo.findById( id ).orElseThrow(() -> new ResourceNotFoundException( "No measurement with id " + id + " found" ) );
+
+        return MeasurementOutputDtoAssembler.assemble( measurement );
     }
 }

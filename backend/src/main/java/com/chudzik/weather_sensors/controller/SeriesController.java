@@ -51,6 +51,7 @@ public class SeriesController {
     }
 
     @DeleteMapping( path = "/api/series/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeSeries( @PathVariable Long id )
     {
         seriesService.removeSeries( id );

@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 
 @Configuration
 public class SecurityConfig {
@@ -28,6 +29,17 @@ public class SecurityConfig {
                 .logout(logout -> logout.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(authenticationEntryPoint))
+                .headers( headers-> headers
+                        .contentSecurityPolicy( csp -> csp.policyDirectives( "default-src 'none'; frame-ancestors 'none'; base-uri 'none"))
+                        .frameOptions( frame -> frame.deny())
+                        .referrerPolicy( referrer -> referrer
+                                .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER))
+                        .permissionsPolicyHeader( permissions -> permissions
+                                .policy( "camera=(), microphone=(), geolocation=(), payment=()"))
+                        .httpStrictTransportSecurity( hsts -> hsts
+                                .includeSubDomains(true)
+                                .preload(true)
+                                .maxAgeInSeconds(31536000)))
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/api/health", "/api/auth/login").permitAll()
@@ -39,6 +51,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/series").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/series/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/series/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/measurements/**").permitAll()
+                        .requestMatchers(HttpMethod.PATCH, "/api/measurements/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/measurements/**").permitAll()
                         .requestMatchers("/api/sensors", "/api/sensors/**").authenticated()
                         .anyRequest().denyAll()
                 )

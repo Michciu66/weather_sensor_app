@@ -14,10 +14,10 @@ public class Admin {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(name = "admin_username", unique = true)
+    @Column(name = "admin_username", unique = true, nullable = false)
     private String username;
 
-    @Column(name = "admin_password")
+    @Column(name = "admin_password", nullable = false)
     private String passwordHash;
 
     public Admin(String username, String passwordHash) {

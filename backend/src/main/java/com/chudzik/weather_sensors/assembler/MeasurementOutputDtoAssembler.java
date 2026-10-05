@@ -9,8 +9,8 @@ public class MeasurementOutputDtoAssembler {
     {
         return new MeasurementOutputDto(
                 measurement.getId(),
-                measurement.getSensor().getId(),
                 measurement.getSeries().getId(),
+                measurement.getSensor() != null ? measurement.getSensor().getId() : null,
                 measurement.getValue(),
                 measurement.getTimestamp() );
     }

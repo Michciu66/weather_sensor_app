@@ -83,7 +83,6 @@ public class AuthToken {
     public String toString() {
         return "AuthToken{" +
                 "id=" + id +
-                ", tokenHash='" + tokenHash + '\'' +
                 ", expiresAt=" + expiresAt +
                 ", revokedAt=" + revokedAt +
                 '}';

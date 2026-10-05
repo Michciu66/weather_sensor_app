@@ -22,7 +22,7 @@ public class Series {
     @Column(name = "series_max", nullable = false)
     BigDecimal maxValue;
 
-    @Column(name = "series_name", nullable = false, length = 50)
+    @Column(name = "series_name", nullable = false, length = 100)
     private String name;
 
     @Column(name = "series_color", nullable = false, length = 7)

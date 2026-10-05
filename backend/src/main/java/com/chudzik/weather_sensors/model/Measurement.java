@@ -1,6 +1,7 @@
 package com.chudzik.weather_sensors.model;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
@@ -29,12 +30,12 @@ public class Measurement {
     private BigDecimal value;
 
     @Column(name = "measurement_timestamp")
-    private OffsetDateTime timestamp;
+    private Instant timestamp;
 
     public Measurement() {
     }
 
-    public Measurement(Series series, Sensor sensor, BigDecimal value, OffsetDateTime timestamp) {
+    public Measurement(Series series, Sensor sensor, BigDecimal value, Instant timestamp) {
         this.series = series;
         this.sensor = sensor;
         this.value = value;
@@ -73,11 +74,11 @@ public class Measurement {
         this.value = value;
     }
 
-    public OffsetDateTime getTimestamp() {
+    public Instant getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(OffsetDateTime timestamp) {
+    public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -96,8 +97,6 @@ public class Measurement {
     public String toString() {
         return "Measurement{" +
                 "id=" + id +
-                ", seriesId=" + series.getId() +
-                ", sensorId=" + sensor.getId() +
                 ", value=" + value +
                 ", timestamp=" + timestamp +
                 '}';

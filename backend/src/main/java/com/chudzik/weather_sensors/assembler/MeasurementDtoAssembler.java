@@ -7,6 +7,10 @@ public class MeasurementDtoAssembler {
 
     public static MeasurementDto assemble(Measurement measurement )
     {
-        return new MeasurementDto(measurement.getId(), measurement.getSeries().getId(), measurement.getSensor().getId(), measurement.getValue(), measurement.getTimestamp() );
+        return new MeasurementDto(measurement.getId(),
+                measurement.getSeries().getId(),
+                measurement.getSensor() != null ? measurement.getId() : null,
+                measurement.getValue(),
+                measurement.getTimestamp() );
     }
 }

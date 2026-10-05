@@ -2,6 +2,7 @@ package com.chudzik.weather_sensors.model;
 
 import jakarta.persistence.*;
 
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ public class Sensor {
     @Column(name = "sensor_id")
     private Long id;
 
-    @Column(name = "sensor_name", length = 50)
+    @Column(name = "sensor_name", length = 100)
     private String name;
 
     @OneToMany(mappedBy = "sensor", fetch = FetchType.LAZY)
@@ -32,10 +33,10 @@ public class Sensor {
     private String apiKeyHash;
 
     @Column(name = "created_at", nullable = false)
-    private OffsetDateTime createdAt;
+    private Instant createdAt;
 
     @Column(name = "last_measurement_at")
-    private OffsetDateTime lastMeasurementAt;
+    private Instant lastMeasurementAt;
 
     public Sensor( String name) { this();
         this.name = name;
@@ -94,19 +95,19 @@ public class Sensor {
         this.apiKeyHash = apiKeyHash;
     }
 
-    public OffsetDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(OffsetDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public OffsetDateTime getLastMeasurementAt() {
+    public Instant getLastMeasurementAt() {
         return lastMeasurementAt;
     }
 
-    public void setLastMeasurementAt(OffsetDateTime lastMeasurementAt) {
+    public void setLastMeasurementAt(Instant lastMeasurementAt) {
         this.lastMeasurementAt = lastMeasurementAt;
     }
 
@@ -126,7 +127,6 @@ public class Sensor {
         return "Sensor{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", apiKeyHash='" + apiKeyHash + '\'' +
                 ", createdAt=" + createdAt +
                 ", lastMeasurementAt=" + lastMeasurementAt +
                 '}';

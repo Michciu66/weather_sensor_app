@@ -74,7 +74,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             IncorrectLoginException exception
     ) {
         return createProblem(
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.UNAUTHORIZED,
                 "Incorrect Login or Password",
                 exception.getMessage()
         );

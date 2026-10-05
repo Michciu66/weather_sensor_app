@@ -1,6 +1,7 @@
 package com.chudzik.weather_sensors.dto;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
@@ -10,7 +11,7 @@ public class MeasurementDto {
     private Long seriesId;
     private Long sensorId;
     private BigDecimal value;
-    private OffsetDateTime timestamp;
+    private Instant timestamp;
 
     public MeasurementDto() {
     }
@@ -20,7 +21,7 @@ public class MeasurementDto {
             Long seriesId,
             Long sensorId,
             BigDecimal value,
-            OffsetDateTime timestamp
+            Instant timestamp
     ) {
         this.id = id;
         this.seriesId = seriesId;
@@ -61,11 +62,11 @@ public class MeasurementDto {
         this.value = value;
     }
 
-    public OffsetDateTime getTimestamp() {
+    public Instant getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(OffsetDateTime timestamp) {
+    public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
     }
 
