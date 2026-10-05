@@ -11,5 +11,5 @@ public record SensorCreatedDto(@NotNull Long id,
                                @NotNull Long seriesId,
                                Instant createdAt,
                                Instant lastMeasurementAt,
-                               @NotBlank @Length( min = 32 ) String apiKey) {
+                               @NotBlank @Length(min = 32) String apiKey) {
 }

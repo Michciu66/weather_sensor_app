@@ -1,6 +1,5 @@
 package com.chudzik.weather_sensors.assembler;
 
-import com.chudzik.weather_sensors.dto.SeriesDto;
 import com.chudzik.weather_sensors.dto.SeriesResponseDto;
 import com.chudzik.weather_sensors.model.Series;
 

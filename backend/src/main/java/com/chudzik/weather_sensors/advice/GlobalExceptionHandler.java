@@ -1,22 +1,18 @@
 package com.chudzik.weather_sensors.advice;
 
 import com.chudzik.weather_sensors.exception.*;
-
 import jakarta.servlet.http.HttpServletRequest;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-import org.springframework.web.bind.MissingRequestHeaderException;
 
 import java.net.URI;
 import java.util.List;
@@ -52,7 +48,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             UnprocessableException exception
     ) {
         return createProblem(
-                HttpStatus.UNPROCESSABLE_ENTITY,
+                HttpStatus.UNPROCESSABLE_CONTENT,
                 "Unprocessable entity",
                 exception.getMessage()
         );
@@ -90,6 +86,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 exception.getMessage()
         );
     }
+
     @ExceptionHandler(InvalidTokenException.class)
     public ProblemDetail handleInvalidTokenException(
             InvalidTokenException exception
@@ -112,9 +109,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException exception,
-            HttpHeaders headers,
-            HttpStatusCode status,
-            WebRequest request
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
+            @NonNull WebRequest request
     ) {
         ProblemDetail problem = createProblem(
                 HttpStatus.BAD_REQUEST,
@@ -145,10 +142,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
-            HttpMessageNotReadableException exception,
-            HttpHeaders headers,
-            HttpStatusCode status,
-            WebRequest request
+            @NonNull HttpMessageNotReadableException exception,
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
+            @NonNull WebRequest request
     ) {
         ProblemDetail problem = createProblem(
                 HttpStatus.BAD_REQUEST,
@@ -167,10 +164,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(
-            HttpMediaTypeNotSupportedException exception,
-            HttpHeaders headers,
-            HttpStatusCode status,
-            WebRequest request
+            @NonNull HttpMediaTypeNotSupportedException exception,
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
+            @NonNull WebRequest request
     ) {
         ProblemDetail problem = createProblem(
                 HttpStatus.UNSUPPORTED_MEDIA_TYPE,
@@ -189,10 +186,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(
-            HttpMediaTypeNotAcceptableException exception,
-            HttpHeaders headers,
-            HttpStatusCode status,
-            WebRequest request
+            @NonNull HttpMediaTypeNotAcceptableException exception,
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
+            @NonNull WebRequest request
     ) {
         ProblemDetail problem = createProblem(
                 HttpStatus.NOT_ACCEPTABLE,

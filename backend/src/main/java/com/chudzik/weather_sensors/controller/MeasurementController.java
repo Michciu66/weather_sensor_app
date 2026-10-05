@@ -36,7 +36,7 @@ public class MeasurementController {
             @RequestHeader("X-API-Key") String sensorApiKey,
             @RequestBody @Valid MeasurementAddDto inputDto
     ) {
-        MeasurementOutputDto outputDto = measurementService.createMeasurement(apiKeyService.hashApiKey(sensorApiKey),inputDto);
+        MeasurementOutputDto outputDto = measurementService.createMeasurement(apiKeyService.hashApiKey(sensorApiKey), inputDto);
         URI location = URI.create("/api/measurements/" + outputDto.id());
 
         return ResponseEntity.created(location).body(outputDto);
@@ -45,11 +45,11 @@ public class MeasurementController {
     @GetMapping(path = "/api/measurements",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<MeasurementOutputDto>> listMeasurements(@RequestParam(required = false) String series,
-                                                                       @RequestParam( required = false) @DateTimeFormat( iso = DateTimeFormat.ISO.DATE_TIME)Instant from,
-                                                                       @RequestParam( required = false) @DateTimeFormat( iso = DateTimeFormat.ISO.DATE_TIME)Instant to,
-                                                                       @RequestParam( defaultValue = "timestamp") String sort,
-                                                                       @RequestParam(defaultValue = "1000") Integer limit ) {
-        MeasurementQueryDto inputDto = new MeasurementQueryDto( series, from, to, sort, limit );
+                                                                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant from,
+                                                                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant to,
+                                                                       @RequestParam(defaultValue = "timestamp") String sort,
+                                                                       @RequestParam(defaultValue = "1000") Integer limit) {
+        MeasurementQueryDto inputDto = new MeasurementQueryDto(series, from, to, sort, limit);
         List<MeasurementOutputDto> outputDtos = measurementService.getMeasurements(inputDto);
 
         return new ResponseEntity<>(outputDtos, HttpStatus.OK);

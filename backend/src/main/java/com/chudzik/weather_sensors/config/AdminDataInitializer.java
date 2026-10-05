@@ -10,11 +10,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class AdminDataInitializer {
-            @Value("${ADMIN_USERNAME}")
-            private String username;
+    @Value("${ADMIN_USERNAME}")
+    private String username;
 
-            @Value("${ADMIN_PASSWORD}")
-            private String password;
+    @Value("${ADMIN_PASSWORD}")
+    private String password;
 
     @Bean
     CommandLineRunner initializeAdmin(AdminRepository adminRepository, PasswordEncoder passwordEncoder) {

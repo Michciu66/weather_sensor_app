@@ -5,12 +5,11 @@ import com.chudzik.weather_sensors.model.Measurement;
 
 public class MeasurementDtoAssembler {
 
-    public static MeasurementDto assemble(Measurement measurement )
-    {
+    public static MeasurementDto assemble(Measurement measurement) {
         return new MeasurementDto(measurement.getId(),
                 measurement.getSeries().getId(),
                 measurement.getSensor() != null ? measurement.getId() : null,
                 measurement.getValue(),
-                measurement.getTimestamp() );
+                measurement.getTimestamp());
     }
 }

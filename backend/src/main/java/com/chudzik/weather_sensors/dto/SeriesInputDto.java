@@ -7,7 +7,7 @@ import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
 
-public record SeriesInputDto(@NotBlank @Length( min = 1, max =  100 ) String name, @NotNull BigDecimal minValue,
+public record SeriesInputDto(@NotBlank @Length(min = 1, max = 100) String name, @NotNull BigDecimal minValue,
                              @NotNull BigDecimal maxValue, @NotNull @Pattern(regexp = "^#[0-9A-Fa-f]{6}$") String color,
-                             String icon, String unit ) {
+                             String icon, String unit) {
 }

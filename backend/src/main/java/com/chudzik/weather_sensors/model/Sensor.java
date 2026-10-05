@@ -3,13 +3,12 @@ package com.chudzik.weather_sensors.model;
 import jakarta.persistence.*;
 
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table( name = "sensors", indexes = {
+@Table(name = "sensors", indexes = {
         @Index(name = "idx_sensors_apihashkey", columnList = "api_key_hash"),
 })
 public class Sensor {
@@ -38,11 +37,13 @@ public class Sensor {
     @Column(name = "last_measurement_at")
     private Instant lastMeasurementAt;
 
-    public Sensor( String name) { this();
+    public Sensor(String name) {
+        this();
         this.name = name;
     }
 
-    public Sensor() { measurementList = new ArrayList<>();
+    public Sensor() {
+        measurementList = new ArrayList<>();
     }
 
     public String getName() {

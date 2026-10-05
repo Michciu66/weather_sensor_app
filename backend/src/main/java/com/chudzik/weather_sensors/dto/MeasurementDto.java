@@ -2,7 +2,6 @@ package com.chudzik.weather_sensors.dto;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.Objects;
 
 public class MeasurementDto {

@@ -24,10 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.List;
-
-import static java.lang.Math.min;
 
 @Service
 public class MeasurementService {
@@ -82,7 +79,7 @@ public class MeasurementService {
 
         sensor.setLastMeasurementAt(timestamp);
 
-        return MeasurementOutputDtoAssembler.assemble( savedMeasurement );
+        return MeasurementOutputDtoAssembler.assemble(savedMeasurement);
     }
 
     private Pageable createPageable(MeasurementQueryDto query) {
@@ -95,12 +92,11 @@ public class MeasurementService {
 
         Sort sort = Sort.by(direction, "timestamp");
 
-        return PageRequest.of( 0, limit, sort);
+        return PageRequest.of(0, limit, sort);
     }
 
     public List<MeasurementOutputDto> getMeasurements(MeasurementQueryDto query) {
-        if( query.limit() <= 0 || query.limit() > 10000 )
-        {
+        if (query.limit() <= 0 || query.limit() > 10000) {
             throw new MalformedQueryException("Limit must be between 1 and 10000");
         }
         if (query.sort() != null
@@ -122,8 +118,8 @@ public class MeasurementService {
     }
 
     public MeasurementOutputDto getMeasurement(Long id) {
-        Measurement measurement = measurementRepo.findById( id ).orElseThrow(() -> new ResourceNotFoundException( "No measurement with id " + id + " found" ) );
+        Measurement measurement = measurementRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("No measurement with id " + id + " found"));
 
-        return MeasurementOutputDtoAssembler.assemble( measurement );
+        return MeasurementOutputDtoAssembler.assemble(measurement);
     }
 }

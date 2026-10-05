@@ -1,11 +1,10 @@
 package com.chudzik.weather_sensors.model;
 
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.Objects;
-
-import jakarta.persistence.*;
 
 @Entity
 @Table(name = "measurements",

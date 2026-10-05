@@ -5,7 +5,7 @@ import com.chudzik.weather_sensors.exception.MalformedQueryException;
 import com.chudzik.weather_sensors.model.Measurement;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,21 +20,21 @@ public class MeasurementQuerySpecification {
     }
 
     public static Specification<Measurement> timestampFrom(
-            OffsetDateTime from
+            Instant from
     ) {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.greaterThanOrEqualTo(
-                        root.<OffsetDateTime>get("timestamp"),
+                        root.get("timestamp"),
                         from
                 );
     }
 
     public static Specification<Measurement> timestampTo(
-            OffsetDateTime to
+            Instant to
     ) {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.lessThanOrEqualTo(
-                        root.<OffsetDateTime>get("timestamp"),
+                        root.get("timestamp"),
                         to
                 );
     }
@@ -59,7 +59,7 @@ public class MeasurementQuerySpecification {
                 (root, cq, cb) -> cb.conjunction();
 
         if (query.series() != null) {
-            List <Long> seriesIds = parseSeriesIds(query.series());
+            List<Long> seriesIds = parseSeriesIds(query.series());
 
             specification = specification.and(
                     MeasurementQuerySpecification.hasSeriesIds(seriesIds)

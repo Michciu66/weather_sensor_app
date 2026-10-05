@@ -14,15 +14,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.Base64;
-import java.util.HexFormat;
 import java.util.Optional;
 
 @Service
@@ -31,14 +25,12 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthTokenRepository authTokenRepo;
     private final SecureRandom secureRandom = new SecureRandom();
-    private final HashService hashService;
     private static final long TOKEN_LIFETIME_SECONDS = 3600;
 
-    public AuthService(AdminRepository adminRepo, PasswordEncoder passwordEncoder, AuthTokenRepository authTokenRepo, HashService hashService) {
+    public AuthService(AdminRepository adminRepo, PasswordEncoder passwordEncoder, AuthTokenRepository authTokenRepo) {
         this.adminRepo = adminRepo;
         this.passwordEncoder = passwordEncoder;
         this.authTokenRepo = authTokenRepo;
-        this.hashService = hashService;
     }
 
     private String generateToken() {
@@ -83,8 +75,7 @@ public class AuthService {
         AuthToken authToken = authTokenRepo.findByTokenHash(HashService.sha256(token)).orElseThrow(InvalidTokenException::new);
 
         String passwordHash = authToken.getAdmin().getPasswordHash();
-        if (!passwordEncoder.matches(input.currentPassword(), passwordHash) )
-        {
+        if (!passwordEncoder.matches(input.currentPassword(), passwordHash)) {
             throw new IncorrectPasswordException();
         }
         authToken.getAdmin().setPasswordHash(passwordEncoder.encode(input.newPassword()));

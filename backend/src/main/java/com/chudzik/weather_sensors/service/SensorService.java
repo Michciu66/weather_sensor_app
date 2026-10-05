@@ -47,25 +47,25 @@ public class SensorService {
 
         Sensor savedSensor = sensorRepo.save(sensor);
 
-        return new SensorCreatedDto( savedSensor.getId(),
+        return new SensorCreatedDto(savedSensor.getId(),
                 savedSensor.getName(),
                 savedSensor.getSeries().getId(),
                 savedSensor.getCreatedAt(),
                 savedSensor.getLastMeasurementAt(),
-                apiKey );
+                apiKey);
     }
 
     public SensorDto getSensor(Long id) {
-        Sensor sensor = sensorRepo.findById( id ).orElseThrow( ()-> new ResourceNotFoundException( "No sensor with id " + id + " found"));
+        Sensor sensor = sensorRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("No sensor with id " + id + " found"));
 
-        return SensorDtoAssembler.assemble( sensor );
+        return SensorDtoAssembler.assemble(sensor);
     }
 
     @Transactional
     public void removeSensor(Long id) {
-        Sensor sensor = sensorRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Sensor with id " + id + " doesn't exist" ) );
+        Sensor sensor = sensorRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Sensor with id " + id + " doesn't exist"));
 
-        sensor.getMeasurementList().forEach( measurement -> measurement.setSensor(null) );
+        sensor.getMeasurementList().forEach(measurement -> measurement.setSensor(null));
         sensorRepo.delete(sensor);
     }
 }

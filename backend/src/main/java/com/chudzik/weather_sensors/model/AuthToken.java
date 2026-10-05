@@ -3,7 +3,6 @@ package com.chudzik.weather_sensors.model;
 import jakarta.persistence.*;
 
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.Objects;
 
 @Entity

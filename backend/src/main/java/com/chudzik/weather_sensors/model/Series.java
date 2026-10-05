@@ -28,10 +28,10 @@ public class Series {
     @Column(name = "series_color", nullable = false, length = 7)
     private String color;
 
-    @Column( name = "series_icon")
+    @Column(name = "series_icon")
     private String icon;
 
-    @Column( name = "series_unit", length = 20)
+    @Column(name = "series_unit", length = 20)
     private String unit;
 
     @OneToMany(mappedBy = "series", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)

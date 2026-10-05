@@ -3,7 +3,6 @@ package com.chudzik.weather_sensors.repository;
 import com.chudzik.weather_sensors.model.Admin;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 

@@ -2,12 +2,9 @@ package com.chudzik.weather_sensors.controller;
 
 import com.chudzik.weather_sensors.dto.SeriesInputDto;
 import com.chudzik.weather_sensors.dto.SeriesResponseDto;
-import com.chudzik.weather_sensors.repository.SeriesRepository;
 import com.chudzik.weather_sensors.service.SeriesService;
 import jakarta.validation.Valid;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -27,10 +24,10 @@ public class SeriesController {
 
     @GetMapping(path = "/api/series", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<List<SeriesResponseDto>> getAllSeries() {
-        return ResponseEntity.ok(seriesService.getAllseries());
+        return ResponseEntity.ok(seriesService.getAllSeries());
     }
 
-    @PostMapping( path = "/api/series", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/api/series", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SeriesResponseDto> createSeries(@Valid @RequestBody SeriesInputDto input) {
         SeriesResponseDto createdSeries = seriesService.create(input);
         URI location = URI.create("/api/series/" + createdSeries.id());
@@ -45,16 +42,15 @@ public class SeriesController {
     }
 
     @PutMapping(path = "/api/series/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SeriesResponseDto> modifySeries(@PathVariable Long id, @RequestBody @Valid SeriesInputDto input ) {
-        SeriesResponseDto series = seriesService.modifySeries(id, input );
+    public ResponseEntity<SeriesResponseDto> modifySeries(@PathVariable Long id, @RequestBody @Valid SeriesInputDto input) {
+        SeriesResponseDto series = seriesService.modifySeries(id, input);
         return new ResponseEntity<>(series, HttpStatus.OK);
     }
 
-    @DeleteMapping( path = "/api/series/{id}")
+    @DeleteMapping(path = "/api/series/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeSeries( @PathVariable Long id )
-    {
-        seriesService.removeSeries( id );
+    public void removeSeries(@PathVariable Long id) {
+        seriesService.removeSeries(id);
     }
 
 }

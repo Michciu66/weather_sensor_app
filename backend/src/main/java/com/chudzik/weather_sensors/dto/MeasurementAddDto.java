@@ -8,7 +8,7 @@ import java.time.Instant;
 public record MeasurementAddDto(@NotNull BigDecimal value, Instant timestamp) {
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return "MeasurementInputDto[" +
                 "value=" + value + ", " +
                 "timestamp=" + timestamp + ']';
