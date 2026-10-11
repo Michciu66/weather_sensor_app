@@ -33,3 +33,5 @@ build/
 .vscode/
 /ZAI projekt 26Z.pdf
 /zai-api-26z.yaml
+
+frontend/node_modules

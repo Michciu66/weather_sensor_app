@@ -1,122 +1,135 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState } from "react";
+import { AuthProvider, useAuth } from "./auth/AuthContext";
+import { LoginForm } from "./components/LoginForm";
+import { AdminPage } from "./pages/AdminPage";
+import { MeasurementsPage } from "./pages/MeasurementsPage";
+import { ChangePasswordForm } from "./components/ChangePasswordForm";
+import "./App.css";
 
-function App() {
-  const [count, setCount] = useState(0)
+type AppView = "measurements" | "admin";
+
+function AppContent() {
+  const { isAuthenticated, logout, authNotice, clearAuthNotice } = useAuth();
+  const [activeView, setActiveView] = useState<AppView>("measurements");
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
+  const [passwordChangeOpen, setPasswordChangeOpen] = useState(false);
+
+  async function handleLogout() {
+    setLogoutError(null);
+
+    try {
+      await logout();
+    } catch {
+      setLogoutError(
+          "The local session was cleared, but the server did not confirm logout. " +
+          "The token may remain valid until it expires.",
+      );
+    } finally {
+      setActiveView("measurements");
+      setPasswordChangeOpen(false);
+    }
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      <>
+        <nav className="auth-toolbar no-print" aria-label="Main navigation">
 
-      <div className="ticks"></div>
+          {authNotice && (
+              <div className="auth-session-notice no-print" role="alert">
+                <span>{authNotice}</span>
+                <button type="button" onClick={clearAuthNotice}>
+                  Dismiss
+                </button>
+              </div>
+          )}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          <div className="auth-status">
+            <strong>Weather Sensors</strong>
+            <span>
+                        {isAuthenticated
+                            ? "Authenticated administrator"
+                            : "Public read-only access"}
+                    </span>
+          </div>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+          <div className="auth-navigation">
+            <button
+                type="button"
+                aria-current={activeView === "measurements" ? "page" : undefined}
+                onClick={() => setActiveView("measurements")}
+            >
+              Measurements
+            </button>
+
+            {isAuthenticated && (
+                <button
+                    type="button"
+                    aria-current={activeView === "admin" ? "page" : undefined}
+                    onClick={() => setActiveView("admin")}
+                >
+                  Admin panel
+                </button>
+            )}
+
+            {isAuthenticated ? (
+                <button type="button" onClick={() => void handleLogout()}>
+                  Log out
+                </button>
+            ) : (
+                <button
+                    type="button"
+                    onClick={() => setLoginOpen((current) => !current)}
+                >
+                  Log in
+                </button>
+            )}
+            {isAuthenticated && (
+                <button
+                    type="button"
+                    aria-expanded={passwordChangeOpen}
+                    onClick={() => setPasswordChangeOpen((current) => !current)}
+                >
+                  Change password
+                </button>
+            )}
+          </div>
+        </nav>
+
+        {logoutError && (
+            <p className="auth-error no-print" role="alert">
+              {logoutError}
+            </p>
+        )}
+
+        {passwordChangeOpen && isAuthenticated && (
+            <ChangePasswordForm
+                onCancel={() => setPasswordChangeOpen(false)}
+                onSuccess={() => setPasswordChangeOpen(false)}
+            />
+        )}
+
+        {loginOpen && !isAuthenticated && (
+            <LoginForm
+                onSuccess={() => {
+                  setLoginOpen(false);
+                  setActiveView("admin");
+                }}
+                onCancel={() => setLoginOpen(false)}
+            />
+        )}
+
+        {activeView === "admin" && isAuthenticated
+            ? <AdminPage />
+            : <MeasurementsPage />}
+      </>
+  );
 }
 
-export default App
+export default function App() {
+  return (
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+  );
+}

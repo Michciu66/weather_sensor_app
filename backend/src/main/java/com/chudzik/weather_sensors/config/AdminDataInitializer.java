@@ -19,10 +19,10 @@ public class AdminDataInitializer {
     @Bean
     CommandLineRunner initializeAdmin(AdminRepository adminRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            if (adminRepository.findByUsername("admin").isEmpty()) {
+/*            if (adminRepository.findByUsername("admin").isEmpty()) {
                 Admin admin = new Admin(username, passwordEncoder.encode(password));
                 adminRepository.save(admin);
-            }
+            }*/
         };
     }
 }

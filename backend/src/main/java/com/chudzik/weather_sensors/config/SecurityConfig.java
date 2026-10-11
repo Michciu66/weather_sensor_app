@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(authenticationEntryPoint))
                 .headers(headers -> headers
-                        .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'none'; frame-ancestors 'none'; base-uri 'none"))
+                        .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'none'; frame-ancestors 'none'; base-uri 'none'"))
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
                         .referrerPolicy(referrer -> referrer
                                 .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER))
@@ -53,9 +53,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/series").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/series/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/series/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/measurements/**").permitAll()
-                        .requestMatchers(HttpMethod.PATCH, "/api/measurements/**").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/api/measurements/**").permitAll()
                         .requestMatchers("/api/sensors", "/api/sensors/**").authenticated()
                         .anyRequest().denyAll()
                 )
