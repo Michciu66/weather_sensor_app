@@ -1,14 +1,44 @@
 services:
-  postgres:
+  db:
     image: postgres:18
     environment:
-      POSTGRES_DB: zai
-      POSTGRES_USER: zai
-      POSTGRES_PASSWORD: zai
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: ${DB_NAME:-weather_sensors}
+      POSTGRES_USER: ${DB_USERNAME:-weather_app}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
     volumes:
-      - postgres-data:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql
+      - ./backend/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/weather_sensors
+      DB_USERNAME: ${DB_USERNAME:-zai}
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:?Set ADMIN_USERNAME in .env}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8080"
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
 
 volumes:
-  postgres-data: {}
+  postgres_data:

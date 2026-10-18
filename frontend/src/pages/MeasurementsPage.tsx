@@ -20,6 +20,24 @@ const LINE_DASH_PATTERNS = [undefined, "6 3", "2 3", "8 3 2 3"] as const;
 const POINT_SHAPES = ["circle", "square", "diamond", "triangle", "cross"] as const;
 type PointShape = (typeof POINT_SHAPES)[number];
 
+type ChartLine = {
+    id: string;
+    dataKey: string;
+    name: string;
+    seriesId: number;
+    sensorId: number | null;
+    color: string;
+    styleIndex: number;
+};
+
+function getSeriesDataKey(seriesId: number): string {
+    return `plot_series_${seriesId}`;
+}
+
+function getSensorDataKey(seriesId: number, sensorId: number | null | undefined): string {
+    return `plot_series_${seriesId}_sensor_${sensorId ?? "unassigned"}`;
+}
+
 function SeriesLegendSymbol({
                                 color,
                                 dash,
@@ -114,6 +132,7 @@ export function MeasurementsPage() {
     const [measurements, setMeasurements] = useState<Measurement[]>([]);
     const [activeMeasurementId, setActiveMeasurementId] = useState<number | null>(null);
     const [hoveredMeasurementId, setHoveredMeasurementId] = useState<number | null>(null);
+    const [groupBySensor, setGroupBySensor] = useState(false);
     const [fromInput, setFromInput] = useState("");
     const [toInput, setToInput] = useState("");
     const [appliedFrom, setAppliedFrom] = useState("");
@@ -244,6 +263,61 @@ export function MeasurementsPage() {
         setHoveredMeasurementId(null);
     }, [selectedSeriesKey]);
 
+    const chartLines = useMemo<ChartLine[]>(() => {
+        if (!groupBySensor) {
+            return selectedSeries.map((item) => {
+                const styleIndex = Math.max(
+                    0,
+                    series.findIndex((candidate) => candidate.id === item.id),
+                );
+
+                return {
+                    id: `series-${item.id}`,
+                    dataKey: getSeriesDataKey(item.id),
+                    name: `${item.name}${item.unit ? ` (${item.unit})` : ""}`,
+                    seriesId: item.id,
+                    sensorId: null,
+                    color: item.color || "#8884d8",
+                    styleIndex,
+                };
+            });
+        }
+
+        // Keep unassigned readings separate for each series, since they cannot be tied to a sensor.
+        const groups = new Map<string, { seriesId: number; sensorId: number | null }>();
+
+        for (const measurement of measurements) {
+            const sensorId = measurement.sensorId ?? null;
+            const groupKey = `${measurement.seriesId}:${sensorId ?? "unassigned"}`;
+
+            if (!groups.has(groupKey)) {
+                groups.set(groupKey, { seriesId: measurement.seriesId, sensorId });
+            }
+        }
+
+        return [...groups.values()]
+            .sort((a, b) => a.seriesId - b.seriesId || (a.sensorId ?? -1) - (b.sensorId ?? -1))
+            .map((group, styleIndex) => {
+                const item = series.find((candidate) => candidate.id === group.seriesId);
+                const seriesName = item
+                    ? `${item.name}${item.unit ? ` (${item.unit})` : ""}`
+                    : `Series ${group.seriesId}`;
+                const sensorName = group.sensorId === null
+                    ? "Unassigned sensor"
+                    : `Sensor ${group.sensorId}`;
+
+                return {
+                    id: `sensor-${group.seriesId}-${group.sensorId ?? "unassigned"}`,
+                    dataKey: getSensorDataKey(group.seriesId, group.sensorId),
+                    name: `${sensorName} — ${seriesName}`,
+                    seriesId: group.seriesId,
+                    sensorId: group.sensorId,
+                    color: item?.color || "#8884d8",
+                    styleIndex,
+                };
+            });
+    }, [groupBySensor, selectedSeries, series, measurements]);
+
     type ChartDataPoint = {
         measurementKey: string;
         time: number;
@@ -252,21 +326,24 @@ export function MeasurementsPage() {
 
     const chartData = useMemo<ChartDataPoint[]>(() => {
         return [...measurements]
-            .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime() || a.id - b.id)
-            .map(measurement => {
+            .sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp) || a.id - b.id)
+            .map((measurement) => {
                 const point: ChartDataPoint = {
                     measurementKey: String(measurement.id),
-                    time: new Date(measurement.timestamp).getTime(),
+                    time: Date.parse(measurement.timestamp),
                 };
 
-                for (const seriesId of selectedSeriesIds) {
-                    point[`plot_${seriesId}`] = null;
+                for (const line of chartLines) {
+                    point[line.dataKey] = null;
                 }
 
-                point[`plot_${measurement.seriesId}`] = measurement.value;
+                const dataKey = groupBySensor
+                    ? getSensorDataKey(measurement.seriesId, measurement.sensorId)
+                    : getSeriesDataKey(measurement.seriesId);
+                point[dataKey] = measurement.value;
                 return point;
             });
-    }, [measurements, selectedSeriesIds]);
+    }, [measurements, chartLines, groupBySensor]);
 
     const scatterData = useMemo(
         () => measurements
@@ -639,29 +716,34 @@ export function MeasurementsPage() {
                     )}
                 </div>
 
-                <div className="chart-legend" aria-label="Displayed measurement series">
-                    {selectedSeries.map((item) => {
-                        const styleIndex = Math.max(
-                            0,
-                            series.findIndex((candidate) => candidate.id === item.id),
-                        );
-                        const color = item.color || "#8884d8";
+                <div className="chart-display-options no-print">
+                    <label className="chart-mode-toggle" htmlFor="group-by-sensor">
+                        <input
+                            id="group-by-sensor"
+                            type="checkbox"
+                            checked={groupBySensor}
+                            onChange={(event) => setGroupBySensor(event.target.checked)}
+                        />
+                        <span>Show a separate line for each sensor</span>
+                    </label>
+                    <p className="chart-mode-description">
+                        {groupBySensor
+                            ? "Each sensor has its own line. Readings without a sensor are grouped separately for each series."
+                            : "Measurements are grouped into one line per selected series."}
+                    </p>
+                </div>
 
-                        return (
-                            <div className="chart-legend-item" key={item.id}>
-                                <SeriesLegendSymbol
-                                    color={color}
-                                    dash={LINE_DASH_PATTERNS[styleIndex % LINE_DASH_PATTERNS.length]}
-                                    shape={POINT_SHAPES[styleIndex % POINT_SHAPES.length]}
-                                />
-
-                                <span>
-                    {item.name}
-                                    {item.unit ? ` (${item.unit})` : ""}
-                </span>
-                            </div>
-                        );
-                    })}
+                <div className="chart-legend" aria-label="Displayed measurement lines">
+                    {chartLines.map((line) => (
+                        <div className="chart-legend-item" key={line.id}>
+                            <SeriesLegendSymbol
+                                color={line.color}
+                                dash={LINE_DASH_PATTERNS[line.styleIndex % LINE_DASH_PATTERNS.length]}
+                                shape={POINT_SHAPES[line.styleIndex % POINT_SHAPES.length]}
+                            />
+                            <span>{line.name}</span>
+                        </div>
+                    ))}
                 </div>
 
                 <p id="chart-keyboard-help" className="chart-keyboard-help">
@@ -719,43 +801,38 @@ export function MeasurementsPage() {
                                     }
                                 />
 
-                                {selectedSeries.map((item) => {
-                                    const styleIndex = Math.max(0, series.findIndex((candidate) => candidate.id === item.id));
+                                {chartLines.map((line) => (
+                                    <Line
+                                        key={line.id}
+                                        type="monotone"
+                                        dataKey={line.dataKey}
+                                        name={line.name}
+                                        stroke={line.color}
+                                        strokeDasharray={LINE_DASH_PATTERNS[line.styleIndex % LINE_DASH_PATTERNS.length]}
+                                        strokeWidth={2}
+                                        dot={false}
+                                        activeDot={false}
+                                        connectNulls
+                                    />
+                                ))}
 
-                                    return (
-                                        <Line
-                                            key={item.id}
-                                            type="monotone"
-                                            dataKey={`plot_${item.id}`}
-                                            name={item.name}
-                                            stroke={item.color || "#8884d8"}
-                                            strokeDasharray={LINE_DASH_PATTERNS[styleIndex % LINE_DASH_PATTERNS.length]}
-                                            strokeWidth={2}
-                                            dot={false}
-                                            activeDot={false}
-                                            connectNulls
-                                        />
-                                    );
-                                })}
-
-                                {selectedSeries.map((item) => {
-                                    const styleIndex = Math.max(0, series.findIndex((candidate) => candidate.id === item.id));
-
-                                    return (
-                                        <Scatter
-                                            key={`points-${item.id}`}
-                                            name={`${item.name} points`}
-                                            data={scatterData.filter((point) => point.seriesId === item.id)}
-                                            dataKey="value"
-                                            fill={item.color || "#8884d8"}
-                                            shape={POINT_SHAPES[styleIndex % POINT_SHAPES.length]}
-                                            activeShape={{ r: 7 }}
-                                            onMouseEnter={(point) => handlePointHover(point)}
-                                            onMouseMove={(point) => handlePointHover(point)}
-                                            onMouseLeave={() => setHoveredMeasurementId(null)}
-                                        />
-                                    );
-                                })}
+                                {chartLines.map((line) => (
+                                    <Scatter
+                                        key={`points-${line.id}`}
+                                        name={`${line.name} points`}
+                                        data={scatterData.filter((point) =>
+                                            point.seriesId === line.seriesId &&
+                                            (!groupBySensor || (point.sensorId ?? null) === line.sensorId),
+                                        )}
+                                        dataKey="value"
+                                        fill={line.color}
+                                        shape={POINT_SHAPES[line.styleIndex % POINT_SHAPES.length]}
+                                        activeShape={{ r: 7 }}
+                                        onMouseEnter={(point) => handlePointHover(point)}
+                                        onMouseMove={(point) => handlePointHover(point)}
+                                        onMouseLeave={() => setHoveredMeasurementId(null)}
+                                    />
+                                ))}
 
                                 {highlightedMeasurement && highlightedSeries && highlightedValue !== null && (
                                     <ReferenceDot

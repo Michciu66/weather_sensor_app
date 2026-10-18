@@ -276,43 +276,6 @@ export function AdminPage() {
             {notice && <div className="admin-message admin-notice" role="status">{notice}</div>}
             {loading && <p aria-live="polite">Loading administration data...</p>}
 
-            {createdSensor && (
-                <section className="admin-panel api-key-panel" aria-labelledby="api-key-heading">
-                    <h2 id="api-key-heading">Sensor API key — copy it now</h2>
-                    <p>
-                        This key is shown only after registration. Store it securely;
-                        you will not be able to retrieve it from the application later.
-                    </p>
-
-                    <p><strong>Sensor:</strong> {createdSensor.name}</p>
-
-                    <label htmlFor="created-api-key">API key</label>
-                    <textarea
-                        id="created-api-key"
-                        readOnly
-                        rows={3}
-                        value={createdSensor.apiKey}
-                        onFocus={(event) => event.currentTarget.select()}
-                    />
-
-                    <div className="admin-actions">
-                        <button type="button" onClick={() => void copyApiKey()}>
-                            {keyCopied ? "Copied" : "Copy API key"}
-                        </button>
-
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setCreatedSensor(null);
-                                setKeyCopied(false);
-                            }}
-                        >
-                            Hide key
-                        </button>
-                    </div>
-                </section>
-            )}
-
             <section className="admin-panel" aria-labelledby="series-heading">
                 <h2 id="series-heading">Measurement series</h2>
 
@@ -416,6 +379,43 @@ export function AdminPage() {
                         )}
                     </div>
                 </form>
+
+                {createdSensor && (
+                    <section className="admin-panel api-key-panel" aria-labelledby="api-key-heading">
+                        <h2 id="api-key-heading">Sensor API key — copy it now</h2>
+                        <p>
+                            This key is shown only after registration. Store it securely;
+                            you will not be able to retrieve it from the application later.
+                        </p>
+
+                        <p><strong>Sensor:</strong> {createdSensor.name}</p>
+
+                        <label htmlFor="created-api-key">API key</label>
+                        <textarea
+                            id="created-api-key"
+                            readOnly
+                            rows={3}
+                            value={createdSensor.apiKey}
+                            onFocus={(event) => event.currentTarget.select()}
+                        />
+
+                        <div className="admin-actions">
+                            <button type="button" onClick={() => void copyApiKey()}>
+                                {keyCopied ? "Copied" : "Copy API key"}
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setCreatedSensor(null);
+                                    setKeyCopied(false);
+                                }}
+                            >
+                                Hide key
+                            </button>
+                        </div>
+                    </section>
+                )}
 
                 <div className="admin-table-container">
                     <table>

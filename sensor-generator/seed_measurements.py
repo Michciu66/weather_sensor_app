@@ -15,23 +15,23 @@ api_keys = sys.argv[2:]
 generator = Path(__file__).with_name("sensor_generator.py")
 
 configs = [
-    ("-20", "30", "0"),
-    ("-20", "30", "1"),
-    ("0", "100", "50"),
-    ("0", "100", "49"),
-    ("900", "1100", "1000"),
-    ("900", "1100", "1010"),
+    ("-20", "30", "0", "gauss"),
+    ("-20", "30", "0", "gauss"),
+    ("0", "100", "50", "gauss"),
+    ("0", "100", "50", "gauss"),
+    ("900", "1100", "1000", "gauss"),
+    ("900", "1100", "1000", "gauss"),
 ]
 
-for api_key, (min_value, max_value, starting_value) in zip(api_keys, configs):
+for api_key, (min_value, max_value, starting_value, rng ) in zip(api_keys, configs):
     subprocess.run([
         sys.executable,
         str(generator),
-        "--count", "15",
-        "--rng", "sin",
+        "--count", "60",
+        "--rng", rng,
         "--min-value", min_value,
         "--max-value", max_value,
-        "--starting-value", starting_value,
+        "--starting_pos", starting_value,
         api_url,
         api_key,
     ], check=True)

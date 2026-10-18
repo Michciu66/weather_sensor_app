@@ -247,6 +247,36 @@ tbody tr.selected-measurement {
     height: 390px;
 }
 
+.chart-display-options {
+    margin: 14px 0 8px;
+}
+
+.chart-mode-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 32px;
+    cursor: pointer;
+}
+
+.chart-mode-toggle input {
+    width: 18px;
+    height: 18px;
+    accent-color: #8ab4f8;
+}
+
+.chart-mode-toggle:focus-within {
+    outline: 2px solid #8ab4f8;
+    outline-offset: 3px;
+    border-radius: 3px;
+}
+
+.chart-mode-description {
+    margin: 5px 0 0;
+    color: #aeb4c2;
+    font-size: 0.9rem;
+}
+
 .chart-legend {
     display: flex;
     flex-wrap: wrap;
